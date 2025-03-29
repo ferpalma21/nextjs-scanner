@@ -1,0 +1,15 @@
+{
+  "name": "Automated Next.js Security Scanner for CVE-2025-29927",
+  "version": "1.0.0",
+  "description": "This script checks if a given website running Next.js is vulnerable to CVE-2025-29927, a critical middleware bypass vulnerability.",
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "puppeteer": "^24.4.0",
+    "yargs": "^17.7.2"
+  }
+}
