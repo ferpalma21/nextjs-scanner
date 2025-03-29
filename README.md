@@ -40,6 +40,7 @@ node index.js -u "https://example.com" -v
 | `-a` | `--attack` | Attempts exploitation (use with caution) |
 | `-w` | `--wordlist` | Wordlist file for exploitation |
 | `-t` | `--headless` | Runs Puppeteer in headless mode |
+| `-x` | `--headers` | If fails to exploit will retry with different headers |
 
 ## Example Usages
 

