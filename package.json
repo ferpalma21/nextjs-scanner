@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-cve-2025-29927-scanner",
+  "name": "nextjs-scanner",
   "author": "ferpalma21",
   "version": "1.0.1",
   "description": "CLI security scanner for identifying potential exposure to CVE-2025-29927 in publicly accessible Next.js applications.",
@@ -15,10 +15,9 @@
     "middleware"
   ],
   "license": "ISC",
-  "author": "YOUR NAME",
   "main": "src/scanner.js",
   "bin": {
-    "nextjs-cve-2025-29927": "./bin/nextjs-cve-2025-29927.js"
+    "nextjs-cve-2025-29927": "bin/nextjs-cve-2025-29927.js"
   },
   "files": [
     "bin",
