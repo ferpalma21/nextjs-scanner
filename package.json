@@ -1,12 +1,38 @@
 {
-  "name": "Automated Next.js Security Scanner for CVE-2025-29927",
-  "version": "1.0.0",
-  "description": "This script checks if a given website running Next.js is vulnerable to CVE-2025-29927, a critical middleware bypass vulnerability.",
+  "name": "nextjs-cve-2025-29927-scanner",
+  "author": "ferpalma21",
+  "version": "1.0.1",
+  "description": "CLI security scanner for identifying potential exposure to CVE-2025-29927 in publicly accessible Next.js applications.",
+  "keywords": [
+    "nextjs",
+    "next.js",
+    "security",
+    "scanner",
+    "cve",
+    "cve-2025-29927",
+    "vulnerability",
+    "pentest",
+    "middleware"
+  ],
   "license": "ISC",
-  "author": "",
-  "main": "index.js",
+  "author": "YOUR NAME",
+  "main": "src/scanner.js",
+  "bin": {
+    "nextjs-cve-2025-29927": "./bin/nextjs-cve-2025-29927.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/nextjs-cve-2025-29927.js",
+    "test": "node --check ./src/scanner.js && node --check ./bin/nextjs-cve-2025-29927.js",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "puppeteer": "^24.4.0",

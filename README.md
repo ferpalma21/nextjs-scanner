@@ -1,7 +1,18 @@
 # Next.js CVE-2025-29927 Vulnerability Scanner
 
-## Overview
-This script scans a list of URLs to detect if they are using **Next.js** and determines whether they are vulnerable to **CVE-2025-29927**. It optionally attempts exploitation using a wordlist.
+A command-line security scanner for identifying publicly accessible Next.js
+applications that may be exposed to CVE-2025-29927.
+
+## Disclaimer
+
+This tool is intended for authorized security testing, vulnerability
+assessment, research, and defensive security work.
+
+Only scan systems that you own or have explicit permission to test.
+
+The scanner performs external fingerprinting and, when explicitly requested,
+active security testing. A result reported as potentially vulnerable should
+not be treated as definitive proof of compromise.
 
 ## Features
 - Identifies websites using **Next.js**.
@@ -13,6 +24,8 @@ This script scans a list of URLs to detect if they are using **Next.js** and det
 - Outputs results to a **JSON object** or a file.
 
 ## Installation
+
+### Through Github
 ```sh
 # Clone the repository
 git clone https://github.com/ferpalma21/Automated-Next.js-Security-Scanner-for-CVE-2025-29927.git
@@ -21,6 +34,11 @@ cd Automated-Next.js-Security-Scanner-for-CVE-2025-29927.git
 # Install dependencies
 npm install
 ```
+
+### Install globally:
+
+```bash
+npm install -g nextjs-cve-2025-29927-scanner
 
 ## Usage
 Run the script with different options:
